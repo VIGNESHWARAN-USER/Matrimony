@@ -24,7 +24,7 @@ const caCert = fs.readFileSync('./ca.pem');
 // MySQL connection
 const db = mysql.createConnection({
   host: process.env.host,
-  user: process.env,user,
+  user: process.env.user,
   password: process.env.password,
   database: process.env.database,
   port: process.env.port,
