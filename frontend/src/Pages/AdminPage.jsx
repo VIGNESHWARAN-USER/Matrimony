@@ -24,7 +24,7 @@ const AdminPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    axios.get('http://localhost:3000/getDetails')
+    axios.get('https://matrimony-jdzy.onrender.com/getDetails')
       .then(response => {
         setDetails(response.data);
         console.log(response.data);

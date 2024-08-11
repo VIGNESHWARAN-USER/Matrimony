@@ -19,7 +19,7 @@ const Requests = ({ user }) => {
 
   const handleActivateAccount = (User_id) => {
     // API call to activate the user account
-    axios.post(`http://localhost:3000/activateUser/${User_id}`)
+    axios.post(`https://matrimony-jdzy.onrender.com/activateUser/${User_id}`)
       .then(response => {
         alert('User account activated successfully');
         setDetails(details.map(user => user.id === userId ? { ...user, status: 'active' } : user));
@@ -32,7 +32,7 @@ const Requests = ({ user }) => {
 
   const handleDeActivateAccount = (User_id) => {
     // API call to activate the user account
-    axios.post(`http://localhost:3000/deactivateUser/${User_id}`)
+    axios.post(`https://matrimony-jdzy.onrender.com/deactivateUser/${User_id}`)
       .then(response => {
         alert('User account deactivated successfully');
         setDetails(details.map(user => user.id === userId ? { ...user, status: 'inactive' } : user));

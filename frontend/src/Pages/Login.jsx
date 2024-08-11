@@ -26,7 +26,7 @@ const Login = () => {
       console.log("Generated OTP:", OTP);
       console.log(formData.email);
       try {
-        const response = await axios.post('http://localhost:3000/send_recovery_email', { OTP, recipient_email: formData.email });
+        const response = await axios.post('https://matrimony-jdzy.onrender.com/send_recovery_email', { OTP, recipient_email: formData.email });
         console.log(response.data.success);
         if (response.data.success) {
           console.log("Working");
@@ -46,7 +46,7 @@ const Login = () => {
   const handleSub = (e) => {
     e.preventDefault();
 
-    axios.post('http://localhost:3000/login', formData)
+    axios.post('https://matrimony-jdzy.onrender.com/login', formData)
       .then(response => {
         // Store user details in local storage
         localStorage.setItem('user', JSON.stringify(response.data));

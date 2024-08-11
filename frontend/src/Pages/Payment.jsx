@@ -62,7 +62,7 @@ const UpiPage = () => {
     formData.append('screenshot', file);
 
     try {
-      const res = await axios.post('http://localhost:3000/uploadPaymentImage', formData, {
+      const res = await axios.post('https://matrimony-jdzy.onrender.com/uploadPaymentImage', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

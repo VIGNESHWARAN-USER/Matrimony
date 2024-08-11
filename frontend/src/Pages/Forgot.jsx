@@ -15,7 +15,7 @@ const Forgot = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:3000/forgot-password', { email });
+      const response = await axios.post('https://matrimony-jdzy.onrender.com/forgot-password', { email });
       setMessage(response.data.message);
       setError(''); // Clear any previous errors
     } catch (err) {

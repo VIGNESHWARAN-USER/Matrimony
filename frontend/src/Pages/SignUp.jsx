@@ -44,7 +44,7 @@ const SignUp = () => {
     setErrors(errors);
 
     if (valid) {
-      axios.post('http://localhost:3000/signup', formData)
+      axios.post('https://matrimony-jdzy.onrender.com/signup', formData)
         .then(response => {
           navigate('../login')
           console.log(response.data);

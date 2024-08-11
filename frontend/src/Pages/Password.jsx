@@ -29,7 +29,7 @@ function Password() {
     }
     try {
       const Email = email;
-      const response = await axios.post("http://localhost:3000/reset-password", { newPassword, Email });
+      const response = await axios.post('https://matrimony-jdzy.onrender.com/reset-password', { newPassword, Email });
       if (response.data.success) {
         navigate("/login");
       } else {

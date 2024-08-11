@@ -70,7 +70,7 @@ const UserProfile = () => {
     e.preventDefault();
     console.log(user.name)
     try {
-      const res = await axios.post('http://localhost:3000/updateProfileDetails', {
+      const res = await axios.post('https://matrimony-jdzy.onrender.com/updateProfileDetails', {
         User_id: user.User_id,
         name: user.name,
         dob: user.dob,
@@ -91,7 +91,7 @@ const UserProfile = () => {
   const handleSaveCareerDetails = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:3000/updateCareerDetails', {
+      const res = await axios.post('https://matrimony-jdzy.onrender.com/updateCareerDetails', {
         User_id: user.User_id,
         highest_degree: user.highest_degree,
         employed_in: user.employed_in,
@@ -111,7 +111,7 @@ const UserProfile = () => {
   const handleSaveLifestyleFamily = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post('http://localhost:3000/updateFamilyDetails', {
+      const res = await axios.post('https://matrimony-jdzy.onrender.com/updateFamilyDetails', {
         User_id: user.User_id,
         family_type: user.family_type,
         father_occupation: user.father_occupation,
@@ -139,7 +139,7 @@ const UserProfile = () => {
       formData.append('User_id', user.User_id)
       formData.append('image', image);
       try {
-        const res = await axios.post('http://localhost:3000/uploadImage', formData, {
+        const res = await axios.post('https://matrimony-jdzy.onrender.com/uploadImage', formData, {
           headers: {
             'Content-Type': 'multipart/form-data',
           },
