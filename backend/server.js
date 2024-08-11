@@ -2,7 +2,7 @@ const express = require('express');
 require('dotenv').config();
 const bodyParser = require('body-parser');
 const mysql = require('mysql');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 const cors = require('cors');
 const path = require('path');
 const multer = require('multer');
@@ -24,10 +24,10 @@ const caCert = fs.readFileSync('./ca.pem');
 // MySQL connection
 const db = mysql.createConnection({
   host: process.env.host,
-  user: process.env.user,
+  user: process.env,user,
   password: process.env.password,
   database: process.env.database,
-  port: 20273,
+  port: process.env.port,
   ssl: {
     ca: caCert,
     rejectUnauthorized: true
