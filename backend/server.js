@@ -160,18 +160,6 @@ app.post("/reset-password", async (req, res) => {
 });
 
 
-const upload = multer({ storage: storage });
-
-// Delete file utility function
-const deleteFile = (filePath) => {
-  fs.unlink(filePath, (err) => {
-    if (err) {
-      console.error('Error deleting file:', err);
-    } else {
-      console.log('File deleted successfully');
-    }
-  });
-};
 
 // Routes
 app.post('/signup', async (req, res) => {
@@ -372,32 +360,25 @@ app.post('/uploadImage', upload.single('image'), async (req, res) => {
     return res.status(400).send({ message: 'No image file uploaded' });
   }
 
-  const newImageUrl = `/uploads/${req.file.filename}`;
+  try {
+    // Convert the image to binary data (Buffer)
+    const imageBuffer = req.file.buffer;
 
-  // Delete existing image file if it exists
-  const getUserQuery = 'SELECT image FROM profile_details WHERE User_id = ?';
-  db.query(getUserQuery, [User_id], (err, results) => {
-    if (err) {
-      console.error('Error fetching user image:', err);
-      return res.status(500).send('Internal Server Error');
-    }
-
-    if (results.length > 0 && results[0].image) {
-      const existingImagePath = path.join('C:\\Users\\ADMIN\\Desktop\\Matrimony Main 8.8\\frontend', results[0].image);
-      deleteFile(existingImagePath);
-    }
-
-    // Update the new image URL in the database
+    // Update the database with the image as a longblob
     const updateImageQuery = 'UPDATE profile_details SET image = ? WHERE User_id = ?';
-    db.query(updateImageQuery, [newImageUrl, User_id], (err, result) => {
+    db.query(updateImageQuery, [imageBuffer, User_id], (err, result) => {
       if (err) {
         console.error('Error updating image:', err);
         return res.status(500).send('Internal Server Error');
       }
-      res.status(200).send({ message: 'Image updated successfully', imageUrl: newImageUrl });
+      res.status(200).send({ message: 'Image updated successfully' });
     });
-  });
+  } catch (error) {
+    console.error('Error processing image:', error);
+    res.status(500).send('Internal Server Error');
+  }
 });
+
 
 app.post('/uploadPaymentImage', upload.single('screenshot'), async (req, res) => {
   const { User_id, name } = req.body;
