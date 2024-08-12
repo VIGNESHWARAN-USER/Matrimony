@@ -375,7 +375,7 @@ app.post('/uploadImage', upload.single('image'), (req, res) => {
 
   const sql = 'UPDATE profile_details SET image = ? WHERE user_id = ?';
 
-  connection.query(sql, [image, userId], (err, result) => {
+  db.query(sql, [image, userId], (err, result) => {
       if (err) {
           console.error('Error updating the database:', err);
           return res.status(500).send('Failed to upload image.');
