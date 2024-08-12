@@ -160,6 +160,18 @@ app.post("/reset-password", async (req, res) => {
 });
 
 
+const upload = multer({ storage: storage });
+
+// Delete file utility function
+const deleteFile = (filePath) => {
+  fs.unlink(filePath, (err) => {
+    if (err) {
+      console.error('Error deleting file:', err);
+    } else {
+      console.log('File deleted successfully');
+    }
+  });
+};
 
 // Routes
 app.post('/signup', async (req, res) => {
@@ -378,7 +390,6 @@ app.post('/uploadImage', upload.single('image'), async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
-
 
 app.post('/uploadPaymentImage', upload.single('screenshot'), async (req, res) => {
   const { User_id, name } = req.body;
