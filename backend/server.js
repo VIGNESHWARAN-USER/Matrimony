@@ -365,30 +365,24 @@ app.get('/getDetails', (req, res) => {
 });
 
 
-app.post('/uploadImage', upload.single('image'), async (req, res) => {
-  const { User_id } = req.body;
+app.post('/uploadImage', upload.single('image'), (req, res) => {
+  const userId = req.body.userId;
+  const image = req.file.buffer;
 
-  if (!req.file) {
-    return res.status(400).send({ message: 'No image file uploaded' });
+  if (!userId || !image) {
+      return res.status(400).send('User ID and image are required.');
   }
 
-  try {
-    // Convert the image to binary data (Buffer)
-    const imageBuffer = req.file.buffer;
+  const sql = 'UPDATE profile_details SET image = ? WHERE user_id = ?';
 
-    // Update the database with the image as a longblob
-    const updateImageQuery = 'UPDATE profile_details SET image = ? WHERE User_id = ?';
-    db.query(updateImageQuery, [imageBuffer, User_id], (err, result) => {
+  connection.query(sql, [image, userId], (err, result) => {
       if (err) {
-        console.error('Error updating image:', err);
-        return res.status(500).send('Internal Server Error');
+          console.error('Error updating the database:', err);
+          return res.status(500).send('Failed to upload image.');
       }
-      res.status(200).send({ message: 'Image updated successfully' });
-    });
-  } catch (error) {
-    console.error('Error processing image:', error);
-    res.status(500).send('Internal Server Error');
-  }
+
+      res.send('Image uploaded successfully!');
+  });
 });
 
 app.post('/uploadPaymentImage', upload.single('screenshot'), async (req, res) => {
