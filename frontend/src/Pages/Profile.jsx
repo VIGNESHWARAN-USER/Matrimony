@@ -24,7 +24,6 @@ const UserProfile = () => {
     status: '',
   });
   const [isEditing, setIsEditing] = useState(false);
-  const [isEditing1, setIsEditing1] = useState(false);
   const [activeState, setActiveState] = useState('ProfileDetails');
 
   useEffect(() => {
@@ -42,10 +41,6 @@ const UserProfile = () => {
 
   const handleEdit = () => {
     setIsEditing(true);
-  };
-
-  const handleEdit1 = () => {
-    setIsEditing1(true);
   };
 
   const handleChange = (e) => {
