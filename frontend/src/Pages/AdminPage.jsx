@@ -49,8 +49,8 @@ const AdminPage = () => {
   };
 
   const getGenderCounts = () => {
-    const maleCount = details.filter(user => user.gender === 'male').length;
-    const femaleCount = details.filter(user => user.gender === 'female').length;
+    const maleCount = details.filter(user => user.gender === 'Male').length;
+    const femaleCount = details.filter(user => user.gender === 'Female').length;
 
     return [
       { name: 'Male', count: maleCount },

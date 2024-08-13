@@ -54,11 +54,6 @@ const Requests = ({ user }) => {
       className="w-32 h-32 rounded-full object-cover mb-4"
       />
       <p><b>User ID:</b>{user.User_id}</p>
-      <img 
-      src={user.screenshot} 
-      alt="Profile" 
-      className=" object-cover mb-4"
-      />
       <p><b>Transaction ID:</b>{user.transaction_id}</p>
       <button
         onClick={handleCloseModal}

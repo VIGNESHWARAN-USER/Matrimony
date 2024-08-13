@@ -8,6 +8,9 @@ const path = require('path');
 const multer = require('multer');
 const fs = require('fs');
 const nodemailer = require('nodemailer');
+const storage = multer.memoryStorage();
+
+const upload = multer({ storage: storage });
 
 const app = express();
 const PORT = 3000;
@@ -42,15 +45,7 @@ db.connect((err) => {
   console.log('MySQL Connected...');
 });
 
-// Multer storage configuration
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, path.join(__dirname, '..', 'frontend', 'uploads'));
-  },
-  filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname));
-  }
-});
+
 
 function sendEmail({ recipient_email, OTP }) {
   return new Promise((resolve, reject) => {
@@ -160,7 +155,7 @@ app.post("/reset-password", async (req, res) => {
 });
 
 
-const upload = multer({ storage: storage });
+
 
 // Delete file utility function
 const deleteFile = (filePath) => {
@@ -278,7 +273,7 @@ app.post('/login', (req, res) => {
     const query = `
       SELECT 
         u.User_id, u.email, u.password, 
-        pd.name, pd.mother_tongue, pd.marital_status, pd.dob, pd.image, pd.gender,
+        pd.name, pd.mother_tongue, pd.marital_status, pd.dob, pd.gender,
         cd.highest_degree, cd.employed_in, cd.annual_income, cd.express_yourself,
         lf.family_type, lf.father_occupation, lf.mother_occupation, lf.brother, lf.sister, 
         lf.family_living_location, lf.contact_address, lf.about_family, lf.status
@@ -329,11 +324,11 @@ app.get('/getDetails', (req, res) => {
     const query = `
       SELECT 
         u.User_id, u.email, u.password, 
-        pd.name, pd.mother_tongue, pd.marital_status, pd.dob, pd.image, pd.gender,
+        pd.name, pd.mother_tongue, pd.marital_status, pd.dob, pd.gender,
         cd.highest_degree, cd.employed_in, cd.annual_income, cd.express_yourself,
         lf.family_type, lf.father_occupation, lf.mother_occupation, lf.brother, lf.sister, 
         lf.family_living_location, lf.contact_address, lf.about_family, lf.status,
-        py.transaction_id, py.screenshot
+        py.transaction_id
       FROM 
         login u
         INNER JOIN profile_details pd ON u.User_id = pd.User_id
@@ -364,70 +359,48 @@ app.get('/getDetails', (req, res) => {
   }
 });
 
+app.get('/getDetails1', (req, res) => {
+  const {User_id} = req.body;
+  console.log(User_id)
+  try {
+    const query = `
+      SELECT 
+        u.User_id, u.email, u.password, 
+        pd.name, pd.mother_tongue, pd.marital_status, pd.dob,  pd.gender,
+        cd.highest_degree, cd.employed_in, cd.annual_income, cd.express_yourself,
+        lf.family_type, lf.father_occupation, lf.mother_occupation, lf.brother, lf.sister, 
+        lf.family_living_location, lf.contact_address, lf.about_family, lf.status,
+        py.transaction_id
+      FROM 
+        login u
+        INNER JOIN profile_details pd ON u.User_id = pd.User_id
+        INNER JOIN career_details cd ON u.User_id = cd.User_id
+        INNER JOIN lifestyle_family lf ON u.User_id = lf.User_id
+        INNER JOIN payment py ON u.User_id  = py.User_id
+      WHERE 
+        u.User_id = ?
+    `;
 
-app.post('/uploadImage', upload.single('image'), (req, res) => {
-  const userId = req.body.userId;
-  const image = req.file.buffer;
-
-  if (!userId || !image) {
-      return res.status(400).send('User ID and image are required.');
-  }
-
-  const sql = 'UPDATE profile_details SET image = ? WHERE user_id = ?';
-
-  db.query(sql, [image, userId], (err, result) => {
+    db.query(query, [User_id], (err, results) => {
       if (err) {
-          console.error('Error updating the database:', err);
-          return res.status(500).send('Failed to upload image.');
+        console.error('Error during searching:', err);
+        return res.status(500).json({ msg: 'Server error' });
       }
 
-      res.send('Image uploaded successfully!');
-  });
-});
+      console.log(results);
 
-app.post('/uploadPaymentImage', upload.single('screenshot'), async (req, res) => {
-  const { User_id, name } = req.body;
-
-  if (!req.file) {
-    return res.status(400).send({ message: 'No image file uploaded' });
-  }
-
-  const newImageUrl = `/uploads/${req.file.filename}`;
-
-  // Fetch existing image and delete it if it exists
-  const getUserQuery = 'SELECT screenshot FROM payment WHERE User_id = ?';
-  db.query(getUserQuery, [User_id], (err, results) => {
-    if (err) {
-      console.error('Error fetching user image:', err);
-      return res.status(500).send('Internal Server Error');
-    }
-    console.log(results[0].screenshot)
-    if (results.length > 0 && results[0].screenshot) {
-      const existingImagePath = path.join('C:\\Users\\ADMIN\\Desktop\\Matrimony Main 8.8\\frontend', results[0].screenshot.toString());
-      if (fs.existsSync(existingImagePath)) {
-        fs.unlink(existingImagePath, (unlinkErr) => {
-          if (unlinkErr) console.error('Error deleting existing image:', unlinkErr);
-        });
+      if (results.length === 0) {
+        return res.status(400).json({ msg: 'No Records Found.' });
       }
-    }
-    console.log(newImageUrl+" "+User_id);
-    const updateImageQuery = 'UPDATE payment SET screenshot = ? WHERE User_id = ?';
-    db.query(updateImageQuery, [newImageUrl, User_id], (err, result) => {
-      if (err) {
-        console.error('Error updating image:', err);
-        return res.status(500).send('Internal Server Error');
-      }
-      const updateStatus = 'UPdate lifestyle_family set status = ? where User_id = ?';
-      db.query(updateStatus,['waiting',User_id], (err, res)=>{
-        if(err){
-          console.error('Error updating status:', err);
-        return res.status(500).send('Internal Server Error');
-        }
-      })
-      res.status(200).send({ message: 'Image updated successfully', imageUrl: newImageUrl });
+    
+      res.json(results); // Send results instead of a non-existent user variable
     });
-  });
+  } catch (err) {
+    console.error('Error during searching:', err.message);
+    res.status(500).json({ msg: 'Server error' });
+  }
 });
+
 
 app.post('/updateProfileDetails', async (req, res) => {
   const { User_id, name, mother_tongue, marital_status, dob, gender } = req.body;
@@ -452,7 +425,7 @@ app.post('/updateProfileDetails', async (req, res) => {
       const query = `
       SELECT 
         u.User_id, u.email, u.password, 
-        pd.name, pd.mother_tongue, pd.marital_status, pd.dob, pd.image, pd.gender,
+        pd.name, pd.mother_tongue, pd.marital_status, pd.dob, pd.gender,
         cd.highest_degree, cd.employed_in, cd.annual_income, cd.express_yourself,
         lf.family_type, lf.father_occupation, lf.mother_occupation, lf.brother, lf.sister, 
         lf.family_living_location, lf.contact_address, lf.about_family, lf.status
@@ -502,7 +475,7 @@ app.post('/updateCareerDetails', async (req, res) => {
       const query = `
       SELECT 
         u.User_id, u.email, u.password, 
-        pd.name, pd.mother_tongue, pd.marital_status, pd.dob, pd.image, pd.gender,
+        pd.name, pd.mother_tongue, pd.marital_status, pd.dob, pd.gender,
         cd.highest_degree, cd.employed_in, cd.annual_income, cd.express_yourself,
         lf.family_type, lf.father_occupation, lf.mother_occupation, lf.brother, lf.sister, 
         lf.family_living_location, lf.contact_address, lf.about_family, lf.status
@@ -557,7 +530,7 @@ app.post('/updateFamilyDetails', async (req, res) => {
       const query = `
       SELECT 
         u.User_id, u.email, u.password, 
-        pd.name, pd.mother_tongue, pd.marital_status, pd.dob, pd.image, pd.gender,
+        pd.name, pd.mother_tongue, pd.marital_status, pd.dob, pd.gender,
         cd.highest_degree, cd.employed_in, cd.annual_income, cd.express_yourself,
         lf.family_type, lf.father_occupation, lf.mother_occupation, lf.brother, lf.sister, 
         lf.family_living_location, lf.contact_address, lf.about_family, lf.status

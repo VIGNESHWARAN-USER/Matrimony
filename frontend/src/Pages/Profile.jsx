@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import ImageDisplay from './ImageDisplay';
-
 const UserProfile = () => {
   const [user, setUser] = useState({
     User_id: '',
@@ -24,14 +22,10 @@ const UserProfile = () => {
     contact_address: '',
     about_family: '',
     status: '',
-    image: '',
   });
-
-  const [image, setImage] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isEditing1, setIsEditing1] = useState(false);
   const [activeState, setActiveState] = useState('ProfileDetails');
-  const [imagepath, setimagepath] = useState('');
 
   useEffect(() => {
     const fetchUserDetails = async () => {
@@ -62,13 +56,9 @@ const UserProfile = () => {
     });
   };
 
-  const handleImageChange = (e) => {
-    setImage(e.target.files[0]);
-  };
-
+ 
   const handleSaveProfileDetails = async (e) => {
     e.preventDefault();
-    console.log(user.name)
     try {
       const res = await axios.post('https://matrimony-jdzy.onrender.com/updateProfileDetails', {
         User_id: user.User_id,
@@ -132,32 +122,7 @@ const UserProfile = () => {
     }
   };
 
-  const handleImageUpload = async (e) => {
-    
-    if (image) {
-      const formData = new FormData();
-      formData.append('User_id', user.User_id)
-      formData.append('image', image);
-      try {
-        const res = await axios.post('https://matrimony-jdzy.onrender.com/uploadImage', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
-        });
-        console.log(res.data.imageUrl);
-        setimagepath(res.data.imageUrl);
-        user.image = res.data.imageUrl;
-        localStorage.setItem('user',JSON.stringify(user));
-        alert('Image uploaded successfully');
-      } catch (error) {
-        console.error('Error uploading image:', error);
-        alert('Error uploading image');
-      }finally{
-        setIsEditing1(false)
-      }
-    }
-  };
-  console.log(imagepath)
+  
   const profileSections = {
     ProfileDetails: (
       <div>
@@ -497,43 +462,10 @@ const UserProfile = () => {
           Lifestyle & Family
         </button>
       </div>
-      <div className="form-group">
-            <label htmlFor="profile_image" className="block text-sm font-medium text-gray-700">Profile Image</label>
-            <input
-              type="file"
-              id="profile_image"
-              name="profile_image"
-              onChange={handleImageChange}
-              disabled={!isEditing1}
-              className="mt-2 block w-full border border-gray-300 rounded-lg p-3 text-gray-800 shadow-sm focus:ring focus:ring-amber-300"
-            />
-        </div>
-        <div className="flex justify-end">
-            {isEditing1? (
-              <button
-                type="button"
-                onClick={()=>handleImageUpload()}
-                className="bg-amber-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-amber-700 focus:ring focus:ring-amber-300"
-              >
-                Save Changes
-              </button>
-            ) : (
-              <button
-                type="button"
-                onClick={handleEdit1}
-                className="bg-amber-600 text-white px-4 py-2 rounded-lg shadow-md hover:bg-amber-700 focus:ring focus:ring-amber-300"
-              >
-                Edit Profile
-              </button>
-            )}
-          </div>
-          
-          <ImageDisplay imagepath={user.image}/>
       <div className="mt-4 max-h-screen overflow-y-auto">
         {profileSections[activeState]}
       </div>
     </div>
   );
 };
-
 export default UserProfile;
