@@ -578,6 +578,28 @@ app.post('/activateUser/:User_id', (req, res) => {
   });
 });
 
+
+app.post('/uploadPaymentImage', (req, res) => {
+  const { transaction_id, User_id } = req.body;
+
+  // SQL query to update the status field to 'active'
+  const updateStatusQuery = 'UPDATE payment SET transaction_id = ? WHERE User_id = ?';
+
+  db.query(updateStatusQuery, [transaction_id, User_id], (err, result) => {
+    if (err) {
+      console.error('Error sending transaction Id:', err);
+      return res.status(500).send('Internal Server Error');
+    }
+
+    if (result.affectedRows > 0) {
+      res.status(200).send({ message: 'Transaction Id sent' });
+    } else {
+      res.status(404).send({ message: 'User not found' });
+    }
+  });
+});
+
+
 app.post('/deactivateUser/:User_id', (req, res) => {
   const { User_id } = req.params;
 

@@ -5,7 +5,7 @@ import axios from 'axios';
 const UpiPage = () => {
   const [copyButtonText, setCopyButtonText] = useState('Copy');
   const [popupVisible, setPopupVisible] = useState(false);
-  const [file, setFile] = useState(null);
+  const [tid, setTid] = useState(null);
   const [user, setUser] = useState({
     User_id: '',
     name: ''
@@ -42,24 +42,17 @@ const UpiPage = () => {
     setPopupVisible(true);
   };
 
-  const handlePopupClose = () => {
-    setPopupVisible(false);
-  };
-
-  const handleFileChange = (event) => {
-    setFile(event.target.files[0]);
-  };
 
   const handleSubmitClick = async () => {
-    if (!file) {
-      alert('Please select a screenshot of the payment!');
+    if (!tid) {
+      alert('Please enter your transaction ID!');
       return;
     }
 
     const formData = new FormData();
     formData.append('User_id', user.User_id);
     formData.append('name', user.name);
-    formData.append('screenshot', file);
+    formData.append('transaction_id', tid);
 
     try {
       const res = await axios.post('https://matrimony-jdzy.onrender.com/uploadPaymentImage', formData, {
@@ -126,14 +119,7 @@ const UpiPage = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md text-center">
             <h2 className="text-xl font-semibold mb-4">Payment Confirmation</h2>
-            <input
-              type="file"
-              id="payment-screenshot"
-              accept="image/*"
-              onChange={handleFileChange}
-              className="mb-4"
-            />
-            <input placeholder='Enter transaction ID' type='text' required className="mb-4"></input>
+            <input placeholder='Enter transaction ID' type='text' value={tid} onChange={(e)=>{setTid(e.target.value)}} required className="mb-4"></input>
             <p className="mb-4">
               You have successfully completed your payment process and it will take 2 to 3 days to
               validate..kindly cooperate!!!
